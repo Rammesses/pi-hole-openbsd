@@ -293,10 +293,10 @@ test_dpkg_lock() {
 
 # Compatibility
 package_manager_detect() {
-    # TODO - pull common packages for both distributions out into a common variable, then add
+    # TODO - pull common packages for all distributions out into a common variable, then add
     # the distro-specific ones below.
 
-    # First check to see if apt-get is installed.
+    # First check to see if apt-get (Raspbian / Debian / Ubuntu) is installed.
     if is_command apt-get ; then
         # Set some global variables here
         # We don't set them earlier since the installed package manager might be rpm, so these values would be different
@@ -346,7 +346,7 @@ package_manager_detect() {
         # and config file
         LIGHTTPD_CFG="lighttpd.conf.debian"
 
-    # If apt-get is not found, check for rpm.
+    # Check to see if rpm (RedHat / Centos) is installed.
     elif is_command rpm ; then
         # Then check if dnf or yum is the package manager
         if is_command dnf ; then
@@ -382,7 +382,12 @@ package_manager_detect() {
             fi
         fi
 
-    # If neither apt-get or yum/dnf package managers were found
+    # Check to see if pkg_add (FreeBSD / OpenBSD) is installed.
+    elif is_command pkg_info ; then
+        printf " %b OpenBSD is not YET supported!\\n" "${CROSS}"
+        exit
+
+    # If no supported package managers were found then exit
     else
         # we cannot install required packages
         printf "  %b No supported package manager found\\n" "${CROSS}"
